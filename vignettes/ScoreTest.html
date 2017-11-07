@@ -82,12 +82,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="standard-score-test" class="section level2">
 <h2>Standard Score Test</h2>
 <p>Consider the linear model:</p>
-<p><span class="math display">\[
-y = X \alpha + G \beta + \epsilon, \; \; \epsilon \sim N( 0 ,\tau R)
-\]</span> Here <span class="math inline">\(\beta\)</span> is the regression parameter of interest, <span class="math inline">\(\alpha\)</span> is a nuisance regression parameter, <span class="math inline">\(\tau\)</span> is a variance component, and <span class="math inline">\(R\)</span> is a fixed correlation structure. The function <code>lmScoreTest</code> provides a score test of <span class="math inline">\(H_{0}:\beta = 0\)</span>. In particular, the score statistic is calculated as:</p>
-<p><span class="math display">\[
-T_{S} = S_{\beta}(\beta=0,\alpha=\tilde{\alpha})'I_{\beta\beta'|\alpha}^{-1}S_{\beta}(\beta=0,\alpha=\tilde{\alpha})'
-\]</span> Here <span class="math inline">\(\tilde{\alpha}\)</span> solves the equation <span class="math inline">\(S_{\alpha}(\beta=0,\alpha) = 0\)</span>. A <span class="math inline">\(p\)</span>-value for <span class="math inline">\(T_{S}\)</span> is estimated by comparison with the <span class="math inline">\(\chi_{\dim(\beta)}^{2}\)</span> distribution.</p>
+<p><span class="math display">\[y=X\alpha+G\beta+\epsilon,\;\;\epsilon\sim N(0,\tau R)\]</span></p>
+<p>Here <span class="math inline">\(\beta\)</span> is the regression parameter of interest, <span class="math inline">\(\alpha\)</span> is a nuisance regression parameter, <span class="math inline">\(\tau\)</span> is a variance component, and <span class="math inline">\(R\)</span> is a fixed correlation structure. The function <code>lmScoreTest</code> provides a score test of <span class="math inline">\(H_{0}:\beta = 0\)</span>. In particular, the score statistic is calculated as:</p>
+<p><span class="math display">\[T_{S}=S_{\beta}(\beta=0,\alpha=\tilde{\alpha})'I_{\beta\beta'|\alpha}^{-1}S_{\beta}(\beta=0,\alpha=\tilde{\alpha})'\]</span></p>
+<p>Here <span class="math inline">\(\tilde{\alpha}\)</span> solves the equation <span class="math inline">\(S_{\alpha}(\beta=0,\alpha) = 0\)</span>. A <span class="math inline">\(p\)</span>-value for <span class="math inline">\(T_{S}\)</span> is estimated by comparison with the <span class="math inline">\(\chi_{\dim(\beta)}^{2}\)</span> distribution.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Phenotype vector</span>
 Y =<span class="st"> </span>ScoreTest::Y;
 <span class="co"># Covariate matrix</span>
