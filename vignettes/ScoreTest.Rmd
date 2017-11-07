@@ -21,7 +21,7 @@ knitr::opts_chunk$set(fig.width=1.5*3, fig.height=1.5*2, fig.align="center", fig
 Consider the linear model:
 
 $$
-y = X\alpha + G\beta+\epsilon,\;\; \epsilon\sim N(0,\tau R)
+y = X \alpha + G \beta + \epsilon, \; \; \epsilon \sim N( 0 ,\tau R)
 $$
 Here $\beta$ is the regression parameter of interest, $\alpha$ is a nuisance regression parameter, $\tau$ is a variance component, and $R$ is a fixed correlation structure. The function `lmScoreTest` provides a score test of $H_{0}:\beta = 0$. In particular, the score statistic is calculated as:
 

@@ -83,7 +83,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2>Standard Score Test</h2>
 <p>Consider the linear model:</p>
 <p><span class="math display">\[
-y = X\alpha + G\beta+\epsilon,\;\; \epsilon\sim N(0,\tau R)
+y = X \alpha + G \beta + \epsilon, \; \; \epsilon \sim N( 0 ,\tau R)
 \]</span> Here <span class="math inline">\(\beta\)</span> is the regression parameter of interest, <span class="math inline">\(\alpha\)</span> is a nuisance regression parameter, <span class="math inline">\(\tau\)</span> is a variance component, and <span class="math inline">\(R\)</span> is a fixed correlation structure. The function <code>lmScoreTest</code> provides a score test of <span class="math inline">\(H_{0}:\beta = 0\)</span>. In particular, the score statistic is calculated as:</p>
 <p><span class="math display">\[
 T_{S} = S_{\beta}(\beta=0,\alpha=\tilde{\alpha})'I_{\beta\beta'|\alpha}^{-1}S_{\beta}(\beta=0,\alpha=\tilde{\alpha})'
