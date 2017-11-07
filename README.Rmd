@@ -1,0 +1,10 @@
+---
+title: "README"
+author: "Zachary McCaw"
+date: "11/07/2017"
+output: rmarkdown::html_vignette
+--- 
+
+# Package Vignette
+```{r,child='vignettes/ScoreTest.Rmd'}
+```
