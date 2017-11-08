@@ -4,14 +4,14 @@
 \alias{Info}
 \title{Estimate Information Matrix}
 \usage{
-Info(X, G, R, tau)
+Info(X, G, Ri, tau)
 }
 \arguments{
 \item{X}{Design matrix for alpha, numeric.}
 
 \item{G}{Design matrix for beta, numeric.}
 
-\item{R}{Correlation structure, numeric.}
+\item{Ri}{Inverse correlation structure, numeric.}
 
 \item{tau}{Variance component, numeric.}
 }

@@ -2,6 +2,27 @@
 #include <Rcpp.h>
 #include <RcppEigen.h>
 
+//' Matrix Inner Product
+//' 
+//' Forms the product \eqn{X'AX}.
+//' @param X Numeric matrix.
+//' @param A Numeric matrix.
+// [[Rcpp::export]]
+SEXP matIP(const Eigen::Map<Eigen::MatrixXd> X,const Eigen::Map<Eigen::MatrixXd> A){
+  const Eigen::MatrixXd Out = (X.transpose() * A * X);
+  return Rcpp::wrap(Out);
+}
+
+//' Fast Inverse
+//' 
+//' Forms the product \eqn{X'AX}.
+//' @param A Numeric matrix.
+// [[Rcpp::export]]
+SEXP fastInv(const Eigen::Map<Eigen::MatrixXd> A){
+  const Eigen::MatrixXd Out = A.completeOrthogonalDecomposition().pseudoInverse();
+  return Rcpp::wrap(A);
+}
+
 //' Generate Exchangable Correlation Structure
 //' 
 //' @param n Dimension
@@ -16,34 +37,33 @@ SEXP exchCorr(const int n, const double r){
   return Rcpp::wrap(Out);
 }
 
-//' Estimate Alpha under H0
+//' Estimate \eqn{\alpha} under \eqn{H_{0}}.
 //' 
 //' Estimates coefficient on nuisance parameter under the \eqn{H_{0}:\beta=0}.
 //' @param X Design matrix for alpha, numeric.
-//' @param R Correlation structure, numeric.
+//' @param Ri Inverse correlation structure, numeric.
 //' @param y Response, numeric.
 //' 
 // [[Rcpp::export]]
-SEXP Alpha0(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> R, const Eigen::Map<Eigen::VectorXd> y){
-  const Eigen::MatrixXd Ri = R.inverse();
+SEXP Alpha0(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> Ri, const Eigen::Map<Eigen::VectorXd> y){
   const Eigen::MatrixXd XtRi = (X.transpose()*Ri);
   const Eigen::MatrixXd XtRiXi = (XtRi*X).completeOrthogonalDecomposition().pseudoInverse();
   const Eigen::VectorXd out = XtRiXi*(XtRi*y);
   return Rcpp::wrap(out);
 }
 
-//' Estimates Tau under H1
+//' Estimate \eqn{tau} under \eqn{H_{1}}.
 //' 
-//' Estimate the variance component \eqn{\tau} under the full model.
+//' Estimates the variance component \eqn{\tau} under the reduced
+//' model where \eqn{\beta = 0}. 
 //' 
 //' @param D Overall design matrix, numeric.
-//' @param R Correlation structure, numeric.
+//' @param Ri Inverse correlation structure, numeric.
 //' @param y Response, numeric.
 //' 
 // [[Rcpp::export]]
 
-SEXP Tau1(const Eigen::Map<Eigen::MatrixXd> D, const Eigen::Map<Eigen::MatrixXd> R, const Eigen::Map<Eigen::VectorXd> y){
-  const Eigen::MatrixXd Ri = R.inverse();
+SEXP Tau1(const Eigen::Map<Eigen::MatrixXd> D, const Eigen::Map<Eigen::MatrixXd> Ri, const Eigen::Map<Eigen::VectorXd> y){
   const Eigen::MatrixXd DtRi = D.transpose()*Ri;
   const Eigen::MatrixXd DtRiDi = (DtRi*D).completeOrthogonalDecomposition().pseudoInverse();
   const Eigen::MatrixXd yhat = D*(DtRiDi*(DtRi*y));
@@ -61,14 +81,13 @@ SEXP Tau1(const Eigen::Map<Eigen::MatrixXd> D, const Eigen::Map<Eigen::MatrixXd>
 //' 
 //' @param X Design matrix for alpha, numeric.
 //' @param G Design matrix for beta, numeric. 
-//' @param R Correlation structure, numeric.
+//' @param Ri Inverse correlation structure, numeric.
 //' @param tau Variance component, numeric.
 //' 
 // [[Rcpp::export]]
 
 SEXP Info(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> G, 
-          const Eigen::Map<Eigen::MatrixXd> R, const double tau){
-  const Eigen::MatrixXd Ri = R.inverse();
+          const Eigen::Map<Eigen::MatrixXd> Ri, const double tau){
   // Iaa
   const Eigen::MatrixXd Iaa = (1/tau)*(X.transpose()*Ri)*X;
   // Iba
@@ -109,14 +128,13 @@ SEXP SchurC(const Eigen::Map<Eigen::MatrixXd> Igg, const Eigen::Map<Eigen::Matri
 //' 
 //' @param e0 Residuals under H0, numeric.
 //' @param G Design matrix for beta, numeric. 
-//' @param R Correlation structure, numeric.
+//' @param Ri Inverse correlation structure, numeric.
 //' @param tau Variance component, numeric.
 //' 
 // [[Rcpp::export]]
 
 SEXP ScoreB(const Eigen::Map<Eigen::VectorXd> e0, const Eigen::Map<Eigen::MatrixXd> G, 
-          const Eigen::Map<Eigen::MatrixXd> R, const double tau){
-  const Eigen::MatrixXd Ri = R.inverse();
+          const Eigen::Map<Eigen::MatrixXd> Ri, const double tau){
   const Eigen::VectorXd S = (1/tau) * G.transpose() * Ri * e0;
   return Rcpp::wrap(S);
 }

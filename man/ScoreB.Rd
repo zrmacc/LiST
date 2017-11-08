@@ -4,14 +4,14 @@
 \alias{ScoreB}
 \title{Calculate Score under H0}
 \usage{
-ScoreB(e0, G, R, tau)
+ScoreB(e0, G, Ri, tau)
 }
 \arguments{
 \item{e0}{Residuals under H0, numeric.}
 
 \item{G}{Design matrix for beta, numeric.}
 
-\item{R}{Correlation structure, numeric.}
+\item{Ri}{Inverse correlation structure, numeric.}
 
 \item{tau}{Variance component, numeric.}
 }

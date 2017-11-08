@@ -2,17 +2,18 @@
 % Please edit documentation in R/RcppExports.R
 \name{Tau1}
 \alias{Tau1}
-\title{Estimates Tau under H1}
+\title{Estimate \eqn{tau} under \eqn{H_{1}}.}
 \usage{
-Tau1(D, R, y)
+Tau1(D, Ri, y)
 }
 \arguments{
 \item{D}{Overall design matrix, numeric.}
 
-\item{R}{Correlation structure, numeric.}
+\item{Ri}{Inverse correlation structure, numeric.}
 
 \item{y}{Response, numeric.}
 }
 \description{
-Estimate the variance component \eqn{\tau} under the full model.
+Estimates the variance component \eqn{\tau} under the reduced
+model where \eqn{\beta = 0}.
 }

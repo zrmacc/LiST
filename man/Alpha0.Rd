@@ -2,14 +2,14 @@
 % Please edit documentation in R/RcppExports.R
 \name{Alpha0}
 \alias{Alpha0}
-\title{Estimate Alpha under H0}
+\title{Estimate \eqn{\alpha} under \eqn{H_{0}}.}
 \usage{
-Alpha0(X, R, y)
+Alpha0(X, Ri, y)
 }
 \arguments{
 \item{X}{Design matrix for alpha, numeric.}
 
-\item{R}{Correlation structure, numeric.}
+\item{Ri}{Inverse correlation structure, numeric.}
 
 \item{y}{Response, numeric.}
 }

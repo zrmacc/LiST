@@ -11,8 +11,11 @@ LinkingTo:
     Rcpp,
     RcppEigen
 Imports:
+    foreach,
+    matrixcalc,
     Rcpp,
-    RcppEigen
+    RcppEigen,
+    stats
 RoxygenNote: 6.0.1
 Suggests: knitr,
     rmarkdown
