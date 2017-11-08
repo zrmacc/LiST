@@ -29,11 +29,12 @@ NULL
 
 ScoreTest = function(G,X,y,R,tau.1=F){
   # Input formatting
+  y = as.numeric(y);
   X = data.frame(X);
   G = data.frame(G);
   # Observations
   n = nrow(X);
-  # Number of covariates
+  # Covariates
   k = ncol(G);
   q = ncol(X);
   # Check for correlation structure
@@ -44,6 +45,9 @@ ScoreTest = function(G,X,y,R,tau.1=F){
   } else {
     Ri = fastInv(R);
   }
+  # Check dimensions
+  check.dim = (nrow(G)==n)&(length(y)==n)&(nrow(Ri)==n);
+  if(!check.dim){stop("Input dimensions are inconsistent")};
   # Estimate alpha under H0
   Dx = model.matrix(~.,data=X);
   alpha0 = Alpha0(X=Dx,Ri=Ri,y=y);
@@ -61,11 +65,11 @@ ScoreTest = function(G,X,y,R,tau.1=F){
   # Information matrix for (beta,alpha)
   J = Info(X=Dx,G=Dg,Ri=Ri,tau=tau);
   # Efficient information for beta
-  K = SchurC(Igg=J$Ibb,Ihh=J$Iaa,Igh=J$Iba,inv=T);
+  Ibb.a = SchurC(Igg=J$Ibb,Ihh=J$Iaa,Igh=J$Iba,inv=T);
   # Score for beta under H0
   S = ScoreB(e0=e0,G=Dg,Ri=Ri,tau=tau);
   # Score statistic
-  Ts = qForm(K=K,s=S);
+  Ts = qForm(K=Ibb.a,s=S);
   # Calculate p-value
   p = pchisq(q=Ts,df=k,lower.tail=F);
   # Output
@@ -74,7 +78,7 @@ ScoreTest = function(G,X,y,R,tau.1=F){
   return(Out);
 }
 
-#' Serial Score Test
+#' Sequential Score Test
 #' 
 #' For each column of \eqn{G_{j}}, tests \eqn{H_{0}:\beta_{j}=0} in the model: 
 #' \deqn{y = G_{j}\beta_{j}+X\alpha+\epsilon} See \code{\link{ScoreTest}} for 
@@ -105,11 +109,12 @@ ScoreTest = function(G,X,y,R,tau.1=F){
 
 sScoreTest = function(G,X,y,R,parallel=F){
   # Input formatting
+  y = as.numeric(y);
   X = data.frame(X);
   G = data.frame(G);
   # Observations
   n = nrow(X);
-  # Number of covariates
+  # Covariates
   k = ncol(G);
   q = ncol(X);
   # Check for correlation structure
@@ -120,6 +125,9 @@ sScoreTest = function(G,X,y,R,parallel=F){
   } else {
     Ri = fastInv(R);
   }
+  # Check dimensions
+  check.dim = (nrow(G)==n)&(length(y)==n)&(nrow(Ri)==n);
+  if(!check.dim){stop("Input dimensions are inconsistent")};
   # Estimate alpha under H0
   Dx = model.matrix(~.,data=X);
   alpha0 = Alpha0(X=Dx,Ri=Ri,y=y);
@@ -131,7 +139,6 @@ sScoreTest = function(G,X,y,R,parallel=F){
   Iaa = (1/tau) * matIP(X=Dx,A=Ri);
   # Apply score test to columns of G
   if(!parallel){registerDoSEQ()};
-  i = NULL;
   Out = foreach(i=1:k,.combine=rbind,.inorder=T) %dopar%{
     # Extract covariate
     g = G[,i];
@@ -141,11 +148,11 @@ sScoreTest = function(G,X,y,R,parallel=F){
     Ibb = (1/tau) * matIP(X=Dg,A=Ri);
     Iba = (1/tau) * t(Dg) %*% data.matrix(Dx);
     # Efficient information for beta
-    K = SchurC(Igg=Ibb,Ihh=Iaa,Igh=Iba,inv=T);
+    Ibb.a = SchurC(Igg=Ibb,Ihh=Iaa,Igh=Iba,inv=T);
     # Score for beta under H0
     S = ScoreB(e0=e0,G=Dg,Ri=Ri,tau=tau);
     # Score statistic
-    Ts = qForm(K=K,s=S);
+    Ts = qForm(K=Ibb.a,s=S);
     # Calculate p-value
     p = pchisq(q=Ts,df=1,lower.tail=F);
     # Results
@@ -154,4 +161,89 @@ sScoreTest = function(G,X,y,R,parallel=F){
     return(Res);
   }
   return(Out)
+}
+
+#' Kernelized Score Test for Linear Models
+#' 
+#' Performs the score test of the null hypothesis \eqn{\beta = 0} for a normal 
+#' linear model of the form: \deqn{y = G\beta + X\alpha + \epsilon} Here 
+#' \eqn{\epsilon} is distributed as \eqn{N(0,\tau R)}, where \eqn{\tau} is a 
+#' variance component, and \eqn{R} is an \eqn{n x n} correlation structure. The 
+#' kernelized score statistic takes the form \deqn{T_{K} =
+#' \tilde{\epsilon}'K\tilde{\epsilon}} Here \eqn{\tilde{\epsilon}} is the
+#' residual estimated under \eqn{H_{0}}, and \eqn{K} is the kernel matrix.
+#' 
+#' @param G Matrix whose regression coefficient is zero in the null model.
+#' @param W Weight matrix.
+#' @param X Matrix whose regression coefficient is unconstrained in the null 
+#'   model.
+#' @param y Response vector.
+#' @param R Optional fixed correlation structure for variance component. Default
+#' is identity.
+#' @param tau.1 Estimate \eqn{\tau} using the full model? If false, \eqn{\tau} 
+#'   is estimated under \eqn{H_{0}}.
+#' @return List including the \code{Score}, the \code{Eigenvalues} of the
+#'   mixutre distribution, and the \code{p} value.
+#' 
+#' @importFrom rARPACK svds
+#' @importFrom CompQuadForm davies
+#' @importFrom matrixcalc is.diagonal.matrix is.positive.semi.definite
+#' @export
+#' 
+#' @examples 
+#' ScoreTest::kScoreTest(G=t(ScoreTest::G[1:3,]),W=diag(c(0.5,0.25,0.25)),X=ScoreTest::X,y=ScoreTest::Y);
+
+kScoreTest = function(G,W,X,y,R,tau.1=F){
+  # Input Checks
+  k = ncol(G);
+  if(nrow(W)!=k){stop("Dimension of weight matrix should match ncol(G).")}
+  # Kernel matrix
+  if(!is.diagonal.matrix(W)){stop("Diagonal weight matrix is expected.")};
+  K = matIP(X=data.matrix(t(G)),A=W);
+  # Input formatting
+  y = as.numeric(y);
+  X = data.frame(X);
+  G = data.frame(G);
+  # Observations
+  n = nrow(X);
+  # Covariates
+  q = ncol(X);
+  # Check for correlation structure
+  if(missing(R)){
+    R = Ri = diag(n)
+  } else if(is.diagonal.matrix(R)){
+    Ri = solve(R);
+  } else {
+    Ri = fastInv(R);
+  }
+  # Check dimensions
+  check.dim = (nrow(G)==n)&(length(y)==n)&(nrow(Ri)==n);
+  if(!check.dim){stop("Input dimensions are inconsistent")};
+  # Number of covariates
+  q = ncol(X);
+  # Estimate alpha under H0
+  Dx = model.matrix(~.,data=X);
+  alpha0 = Alpha0(X=Dx,Ri=Ri,y=y);
+  # Null residuals
+  e0 = (y - Dx %*% alpha0);
+  # Estimate tau
+  if(tau.1){
+    D = model.matrix(~.,data=data.frame(X,G))
+    tau = Tau1(D=D,Ri=Ri,y=y);
+  } else {
+    tau = sum(e0^2)/(n-q);
+  }
+  # Residual variance
+  V = residV(X=Dx,R=R,tau=tau);
+  # Score statistic
+  Ts = qForm(K=K,s=e0);
+  # Eigenvalues
+  U = K %*% V;
+  lambda = svds(A=U,k=k,nu=0,nv=0)$d;
+  lambda = round(lambda,digits=8);
+  # Calculate p-value
+  p = davies(q=Ts,lambda=lambda)$Qq;
+  # Output
+  Out = list("Score"=Ts,"Eigenvalues"=lambda,"p"=p);
+  return(Out);
 }

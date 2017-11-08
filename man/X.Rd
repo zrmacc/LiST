@@ -4,7 +4,7 @@
 \name{X}
 \alias{X}
 \title{Simulated Covariates}
-\format{A numeric matrix with 100 rows and 4 columns
+\format{A numeric matrix with 1000 rows and 4 columns
 \describe{
    \item{Age}{Age.}
    \item{Sex}{Sex.}

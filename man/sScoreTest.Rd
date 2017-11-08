@@ -2,7 +2,7 @@
 % Please edit documentation in R/ScoreTest.R
 \name{sScoreTest}
 \alias{sScoreTest}
-\title{Serial Score Test}
+\title{Sequential Score Test}
 \usage{
 sScoreTest(G, X, y, R, parallel = F)
 }

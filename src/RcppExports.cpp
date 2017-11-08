@@ -121,6 +121,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// residV
+SEXP residV(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> R, const double tau);
+RcppExport SEXP _ScoreTest_residV(SEXP XSEXP, SEXP RSEXP, SEXP tauSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type R(RSEXP);
+    Rcpp::traits::input_parameter< const double >::type tau(tauSEXP);
+    rcpp_result_gen = Rcpp::wrap(residV(X, R, tau));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_ScoreTest_matIP", (DL_FUNC) &_ScoreTest_matIP, 2},
@@ -132,6 +145,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_ScoreTest_SchurC", (DL_FUNC) &_ScoreTest_SchurC, 4},
     {"_ScoreTest_ScoreB", (DL_FUNC) &_ScoreTest_ScoreB, 4},
     {"_ScoreTest_qForm", (DL_FUNC) &_ScoreTest_qForm, 2},
+    {"_ScoreTest_residV", (DL_FUNC) &_ScoreTest_residV, 3},
     {NULL, NULL, 0}
 };
 

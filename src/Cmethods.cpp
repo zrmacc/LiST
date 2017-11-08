@@ -62,7 +62,6 @@ SEXP Alpha0(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixX
 //' @param y Response, numeric.
 //' 
 // [[Rcpp::export]]
-
 SEXP Tau1(const Eigen::Map<Eigen::MatrixXd> D, const Eigen::Map<Eigen::MatrixXd> Ri, const Eigen::Map<Eigen::VectorXd> y){
   const Eigen::MatrixXd DtRi = D.transpose()*Ri;
   const Eigen::MatrixXd DtRiDi = (DtRi*D).completeOrthogonalDecomposition().pseudoInverse();
@@ -85,7 +84,6 @@ SEXP Tau1(const Eigen::Map<Eigen::MatrixXd> D, const Eigen::Map<Eigen::MatrixXd>
 //' @param tau Variance component, numeric.
 //' 
 // [[Rcpp::export]]
-
 SEXP Info(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> G, 
           const Eigen::Map<Eigen::MatrixXd> Ri, const double tau){
   // Iaa
@@ -107,7 +105,6 @@ SEXP Info(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd>
 //' 
 //' @export  
 // [[Rcpp::export]]
-
 SEXP SchurC(const Eigen::Map<Eigen::MatrixXd> Igg, const Eigen::Map<Eigen::MatrixXd> Ihh, 
             const Eigen::Map<Eigen::MatrixXd> Igh, const bool inv){
   // Inverse of B
@@ -132,7 +129,6 @@ SEXP SchurC(const Eigen::Map<Eigen::MatrixXd> Igg, const Eigen::Map<Eigen::Matri
 //' @param tau Variance component, numeric.
 //' 
 // [[Rcpp::export]]
-
 SEXP ScoreB(const Eigen::Map<Eigen::VectorXd> e0, const Eigen::Map<Eigen::MatrixXd> G, 
           const Eigen::Map<Eigen::MatrixXd> Ri, const double tau){
   const Eigen::VectorXd S = (1/tau) * G.transpose() * Ri * e0;
@@ -147,5 +143,21 @@ SEXP ScoreB(const Eigen::Map<Eigen::VectorXd> e0, const Eigen::Map<Eigen::Matrix
 // [[Rcpp::export]]
 SEXP qForm(const Eigen::Map<Eigen::MatrixXd> K, const Eigen::VectorXd s){
   const double Out = (s.transpose() * K * s);
+  return Rcpp::wrap(Out);
+}
+
+//' Residual Variance
+//' 
+//' Calculate the variance of \eqn{y-X\tilde{\alpha}} under \eqn{H_{0}}.
+//' 
+//' @param X Desigm matrix for alpha, numeric.
+//' @param R Correlation structure, numeric.
+//' @param tau Variance component, numeric.
+// [[Rcpp::export]]
+SEXP residV(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> R,
+            const double tau){
+  const Eigen::MatrixXd XtR = X.transpose()*R;
+  const Eigen::MatrixXd XtRXi = (XtR*X).completeOrthogonalDecomposition().pseudoInverse();
+  const Eigen::MatrixXd Out = tau*(R - (XtR.transpose())*XtRXi*XtR);
   return Rcpp::wrap(Out);
 }

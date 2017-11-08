@@ -4,7 +4,7 @@
 \name{G}
 \alias{G}
 \title{Simulated Genotypes}
-\format{An integer matrix with 1000 rows and 100 columns
+\format{An integer matrix with 1000 rows and 1000 columns
 \describe{ 
    \item{s1-s100}{s[i] is an integer vector of minor allele counts for the ith subject.}
 }}
@@ -12,7 +12,7 @@
 G
 }
 \description{
-Simulated genotypes for 100 subjects at 1000 loci. Genotypes were simulated 
+Simulated genotypes for 1000 subjects at 1000 loci. Genotypes were simulated 
 with use of hapgen2, and are based on the haplotype structure of human 
 chromosome one in the CEU population of the 1000 Genomes Project.
 }

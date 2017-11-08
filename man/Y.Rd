@@ -4,7 +4,7 @@
 \name{Y}
 \alias{Y}
 \title{Simulated Phenotype}
-\format{A numeric matrix with 100 rows and 1 columns
+\format{A numeric matrix with 1000 rows and 1 columns
 \describe{
    \item{YN}{Normal phenotype.}
 }}

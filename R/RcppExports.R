@@ -99,3 +99,14 @@ qForm <- function(K, s) {
     .Call('_ScoreTest_qForm', PACKAGE = 'ScoreTest', K, s)
 }
 
+#' Residual Variance
+#' 
+#' Calculate the variance of \eqn{y-X\tilde{\alpha}} under \eqn{H_{0}}.
+#' 
+#' @param X Desigm matrix for alpha, numeric.
+#' @param R Correlation structure, numeric.
+#' @param tau Variance component, numeric.
+residV <- function(X, R, tau) {
+    .Call('_ScoreTest_residV', PACKAGE = 'ScoreTest', X, R, tau)
+}
+
