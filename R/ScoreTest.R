@@ -191,7 +191,7 @@ sScoreTest = function(G,X,y,R,parallel=F){
 #' @export
 #' 
 #' @examples 
-#' ScoreTest::kScoreTest(G=t(ScoreTest::G[1:3,]),W=diag(c(0.5,0.25,0.25)),X=ScoreTest::X,y=ScoreTest::Y);
+#' 
 
 kScoreTest = function(G,W,X,y,R,tau.1=F){
   # Input Checks

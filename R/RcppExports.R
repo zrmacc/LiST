@@ -70,9 +70,8 @@ Info <- function(X, G, Ri, tau) {
 #' @param Igg First information matrix.
 #' @param Ihh Second information matrix.
 #' @param Igh Cross information matrix.
-#' @param inv Return the inverse of 
-#' 
-#' @export  
+#' @param inv Return the inverse of the Schur complement?
+#'   
 SchurC <- function(Igg, Ihh, Igh, inv) {
     .Call('_ScoreTest_SchurC', PACKAGE = 'ScoreTest', Igg, Ihh, Igh, inv)
 }

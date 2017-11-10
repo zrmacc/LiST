@@ -13,7 +13,7 @@ SchurC(Igg, Ihh, Igh, inv)
 
 \item{Igh}{Cross information matrix.}
 
-\item{inv}{Return the inverse of}
+\item{inv}{Return the inverse of the Schur complement?}
 }
 \description{
 Calcualtes the matrix \deqn{I_{gg}-I_{gh}I_{hh}^{-1}I_{gh}'}

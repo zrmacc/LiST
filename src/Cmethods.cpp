@@ -47,8 +47,8 @@ SEXP exchCorr(const int n, const double r){
 // [[Rcpp::export]]
 SEXP Alpha0(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> Ri, const Eigen::Map<Eigen::VectorXd> y){
   const Eigen::MatrixXd XtRi = (X.transpose()*Ri);
-  const Eigen::MatrixXd XtRiXi = (XtRi*X).completeOrthogonalDecomposition().pseudoInverse();
-  const Eigen::VectorXd out = XtRiXi*(XtRi*y);
+  const Eigen::MatrixXd XtRiX = XtRi*X;
+  const Eigen::VectorXd out = XtRiX.llt().solve(XtRi*y);
   return Rcpp::wrap(out);
 }
 
@@ -64,8 +64,8 @@ SEXP Alpha0(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixX
 // [[Rcpp::export]]
 SEXP Tau1(const Eigen::Map<Eigen::MatrixXd> D, const Eigen::Map<Eigen::MatrixXd> Ri, const Eigen::Map<Eigen::VectorXd> y){
   const Eigen::MatrixXd DtRi = D.transpose()*Ri;
-  const Eigen::MatrixXd DtRiDi = (DtRi*D).completeOrthogonalDecomposition().pseudoInverse();
-  const Eigen::MatrixXd yhat = D*(DtRiDi*(DtRi*y));
+  const Eigen::MatrixXd DtRiD = DtRi*D;
+  const Eigen::VectorXd yhat = D*(DtRiD.llt().solve(DtRi*y));
   const Eigen::VectorXd resid = y-yhat;
   const double SS = (resid.transpose())*Ri*resid;
   const int n = D.rows();
@@ -101,16 +101,13 @@ SEXP Info(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd>
 //' @param Igg First information matrix.
 //' @param Ihh Second information matrix.
 //' @param Igh Cross information matrix.
-//' @param inv Return the inverse of 
-//' 
-//' @export  
+//' @param inv Return the inverse of the Schur complement?
+//'   
 // [[Rcpp::export]]
 SEXP SchurC(const Eigen::Map<Eigen::MatrixXd> Igg, const Eigen::Map<Eigen::MatrixXd> Ihh, 
             const Eigen::Map<Eigen::MatrixXd> Igh, const bool inv){
-  // Inverse of B
-  const Eigen::MatrixXd Ihhi = Ihh.completeOrthogonalDecomposition().pseudoInverse();
   // Schur Complement
-  const Eigen::MatrixXd S = Igg - Igh * Ihhi * Igh.transpose();
+  const Eigen::MatrixXd S = Igg - Igh * Ihh.llt().solve(Igh.transpose());
   // Inverse Schur Complement
   if(inv==TRUE){
     const Eigen::MatrixXd Out = S.completeOrthogonalDecomposition().pseudoInverse();
@@ -157,7 +154,7 @@ SEXP qForm(const Eigen::Map<Eigen::MatrixXd> K, const Eigen::VectorXd s){
 SEXP residV(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> R,
             const double tau){
   const Eigen::MatrixXd XtR = X.transpose()*R;
-  const Eigen::MatrixXd XtRXi = (XtR*X).completeOrthogonalDecomposition().pseudoInverse();
-  const Eigen::MatrixXd Out = tau*(R - (XtR.transpose())*XtRXi*XtR);
+  const Eigen::MatrixXd XtRX = XtR*X;
+  const Eigen::MatrixXd Out = tau*(R - XtR.transpose()*(XtRX.llt().solve(XtR)));
   return Rcpp::wrap(Out);
 }

@@ -1,7 +1,7 @@
 ---
 title: "Score Test"
 author: "Zachary McCaw"
-date: "Updated: 11/08/17"
+date: "Updated: 11/10/17"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Score Test}
@@ -100,7 +100,7 @@ P = foreach(r=1:R,.combine=rbind,.inorder=F) %dopar% {
   Gsub = Gsub[,!flag];
   W = diag(d[!flag]);
   # Kernelized score test
-  pk = ScoreTest::kScoreTest(G=Gsub,W=W,X=X,y=Y)$p;
+  pk = kScoreTest(G=Gsub,W=W,X=X,y=Y)$p;
   # Output
   Out = c("Score"=p,"Kernel.p"=pk);
 }
