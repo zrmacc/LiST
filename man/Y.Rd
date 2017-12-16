@@ -12,8 +12,9 @@
 Y
 }
 \description{
-Phenotypes simulated under the null hypothesis of no
-genotypic effect. A subject specific linear predictor was calculated based on
-age, sex, pc1, and pc2. Residuals were drawn from a N(0,1) distribution.
+Phenotypes simulated under the null hypothesis of no genotypic effect. A
+subject specific linear predictor was calculated based on the covaraites. For
+\code{Y.ind}, the residuals were drawn from a N(0,I) distribution. For \code{Y.corr},
+the residuals were drawn from a N(0,R) distribution
 }
 \keyword{datasets}

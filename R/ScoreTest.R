@@ -1,8 +1,8 @@
-#' @useDynLib ScoreTest
+#' @useDynLib NormalScoreTest
 #' @importFrom Rcpp sourceCpp
 NULL
 
-#' Score Test for Linear Models
+#' Score Test for Normal Models
 #' 
 #' Performs the score test of the null hypothesis \eqn{\beta = 0} for a normal 
 #' linear model of the form: \deqn{y = G\beta + X\alpha + \epsilon} Here 
@@ -15,8 +15,6 @@ NULL
 #' @param y Response vector.
 #' @param R Optional fixed correlation structure for variance component. Default
 #'   is identity.
-#' @param tau.1 Estimate \eqn{\tau} using the full model? If false, \eqn{\tau}
-#'   is estimated under \eqn{H_{0}}.
 #' @return Vector including the score statistic, the degrees of freedom, and a 
 #'   p-value based on the chi-square distribution.
 #'   
@@ -25,9 +23,13 @@ NULL
 #' @export
 #' 
 #' @examples 
-#' ScoreTest::ScoreTest(G=ScoreTest::G[1,],X=ScoreTest::X,y=ScoreTest::Y);
+#' # Genotypes
+#' g = NormalScoreTest::G[,1,drop=F];
+#' # Phenotype
+#' y = NormalScoreTest::Y[,1];
+#' NormalScoreTest::NormScore(G=g,X=NormalScoreTest::X,y=y);
 
-ScoreTest = function(G,X,y,R,tau.1=F){
+NormScore = function(G,X,y,R,tau.1=F){
   # Input formatting
   y = as.numeric(y);
   X = data.frame(X);
@@ -40,7 +42,7 @@ ScoreTest = function(G,X,y,R,tau.1=F){
   # Check for correlation structure
   if(missing(R)){
     Ri = diag(n)
-  } else if(is.diagonal.matrix(R)){
+  } else if(matrixcalc::is.diagonal.matrix(R)){
     Ri = solve(R);
   } else {
     Ri = fastInv(R);
@@ -48,28 +50,16 @@ ScoreTest = function(G,X,y,R,tau.1=F){
   # Check dimensions
   check.dim = (nrow(G)==n)&(length(y)==n)&(nrow(Ri)==n);
   if(!check.dim){stop("Input dimensions are inconsistent")};
-  # Estimate alpha under H0
+  # Design matrix for X
   Dx = model.matrix(~.,data=X);
+  # Estimate alpha under H0
   alpha0 = Alpha0(X=Dx,Ri=Ri,y=y);
-  # Null residuals
-  e0 = (y - Dx %*% alpha0);
-  # Estimate tau
-  if(tau.1){
-    D = model.matrix(~.,data=data.frame(X,G))
-    tau = Tau1(D=D,Ri=Ri,y=y);
-  } else {
-    tau = sum(e0^2)/(n-q);
-  }
-  # Design matrix for G
+  # Estimate tau under H0
+  tau0 = Tau0(X=Dx,Ri=Ri,y=y,a=alpha0);
+  # Design matrix for G 
   Dg = model.matrix(~0+.,data=G);
-  # Information matrix for (beta,alpha)
-  J = Info(X=Dx,G=Dg,Ri=Ri,tau=tau);
-  # Efficient information for beta
-  Ibb.a = SchurC(Igg=J$Ibb,Ihh=J$Iaa,Igh=J$Iba,inv=T);
-  # Score for beta under H0
-  S = ScoreB(e0=e0,G=Dg,Ri=Ri,tau=tau);
   # Score statistic
-  Ts = qForm(K=Ibb.a,s=S);
+  Ts = nScore(X=Dx,G=Dg,Ri=Ri,y=y,tau=tau0);
   # Calculate p-value
   p = pchisq(q=Ts,df=k,lower.tail=F);
   # Output
@@ -78,7 +68,7 @@ ScoreTest = function(G,X,y,R,tau.1=F){
   return(Out);
 }
 
-#' Sequential Score Test
+#' Repeated Score Test
 #' 
 #' For each column of \eqn{G_{j}}, tests \eqn{H_{0}:\beta_{j}=0} in the model: 
 #' \deqn{y = G_{j}\beta_{j}+X\alpha+\epsilon} See \code{\link{ScoreTest}} for 
@@ -95,19 +85,22 @@ ScoreTest = function(G,X,y,R,tau.1=F){
 #'   statistic, the degrees of freedom, and a p-value based on the chi-square
 #'   distribution.
 #' 
-#' @importFrom stats model.matrix pchisq
 #' @importFrom foreach "%dopar%" foreach registerDoSEQ
+#' @importFrom matrixcalc is.diagonal.matrix
+#' @importFrom stats model.matrix pchisq
 #' @export 
 #' 
 #' @examples 
 #' # Genotype matrix
-#' G = ScoreTest::G;
+#' G = NormalScoreTest::G;
 #' # Standardizing genotype matrix
-#' Gs = scale(t(G));
+#' Gs = scale(G);
+#' # Phenotype
+#' y = NormalScoreTest::Y[,1];
 #' # Apply score test to each column of Gs
-#' Results = ScoreTest::sScoreTest(G=Gs,X=ScoreTest::X,y=ScoreTest::Y);
+#' Results = NormalScoreTest::rNormScore(G=Gs,X=NormalScoreTest::X,y=y);
 
-sScoreTest = function(G,X,y,R,parallel=F){
+rNormScore = function(G,X,y,R,parallel=F){
   # Input formatting
   y = as.numeric(y);
   X = data.frame(X);
@@ -120,7 +113,7 @@ sScoreTest = function(G,X,y,R,parallel=F){
   # Check for correlation structure
   if(missing(R)){
     Ri = diag(n)
-  } else if(is.diagonal.matrix(R)){
+  } else if(matrixcalc::is.diagonal.matrix(R)){
     Ri = solve(R);
   } else {
     Ri = fastInv(R);
@@ -131,28 +124,16 @@ sScoreTest = function(G,X,y,R,parallel=F){
   # Estimate alpha under H0
   Dx = model.matrix(~.,data=X);
   alpha0 = Alpha0(X=Dx,Ri=Ri,y=y);
-  # Null residuals
-  e0 = (y - Dx %*% alpha0);
   # Estimate tau
-  tau = sum(e0^2)/(n-q);
-  # Information for alpha
-  Iaa = (1/tau) * matIP(X=Dx,A=Ri);
-  # Apply score test to columns of G
+  tau0 = Tau0(X=Dx,Ri=Ri,y=y,a=alpha0);
   if(!parallel){registerDoSEQ()};
   Out = foreach(i=1:k,.combine=rbind,.inorder=T) %dopar%{
     # Extract covariate
     g = G[,i];
     # Design matrix for G
     Dg = model.matrix(~0+.,data=data.frame(g));
-    # Information for beta
-    Ibb = (1/tau) * matIP(X=Dg,A=Ri);
-    Iba = (1/tau) * t(Dg) %*% data.matrix(Dx);
-    # Efficient information for beta
-    Ibb.a = SchurC(Igg=Ibb,Ihh=Iaa,Igh=Iba,inv=T);
-    # Score for beta under H0
-    S = ScoreB(e0=e0,G=Dg,Ri=Ri,tau=tau);
     # Score statistic
-    Ts = qForm(K=Ibb.a,s=S);
+    Ts = nScore(X=Dx,G=Dg,Ri=Ri,y=y,tau=tau0);
     # Calculate p-value
     p = pchisq(q=Ts,df=1,lower.tail=F);
     # Results
@@ -171,7 +152,7 @@ sScoreTest = function(G,X,y,R,parallel=F){
 #' variance component, and \eqn{R} is an \eqn{n x n} correlation structure. The 
 #' kernelized score statistic takes the form \deqn{T_{K} =
 #' \tilde{\epsilon}'K\tilde{\epsilon}} Here \eqn{\tilde{\epsilon}} is the
-#' residual estimated under \eqn{H_{0}}, and \eqn{K} is the kernel matrix.
+#' residual estimated under \eqn{H_{0}}, and \eqn{K = WG(WG)'} is the kernel matrix.
 #' 
 #' @param G Matrix whose regression coefficient is zero in the null model.
 #' @param W Weight matrix.
@@ -180,26 +161,31 @@ sScoreTest = function(G,X,y,R,parallel=F){
 #' @param y Response vector.
 #' @param R Optional fixed correlation structure for variance component. Default
 #' is identity.
-#' @param tau.1 Estimate \eqn{\tau} using the full model? If false, \eqn{\tau} 
-#'   is estimated under \eqn{H_{0}}.
 #' @return List including the \code{Score}, the \code{Eigenvalues} of the
 #'   mixutre distribution, and the \code{p} value.
 #' 
-#' @importFrom rARPACK svds
 #' @importFrom CompQuadForm davies
 #' @importFrom matrixcalc is.diagonal.matrix is.positive.semi.definite
 #' @export
 #' 
 #' @examples 
-#' 
+#' # Genotypes
+#' G = NormalScoreTest::G[,1:10];
+#' maf = apply(G,MARGIN=2,FUN=mean)/2;
+#' Gs = scale(G);
+#' # Weights
+#' W = round(diag((dbeta(x=maf,1,25))),digits=6);
+#' # Phenotype
+#' y = NormalScoreTest::Y[,1];
+#' Results = NormalScoreTest::kNormScore(G=Gs,W=W,X=NormalScoreTest::X,y=y);
 
-kScoreTest = function(G,W,X,y,R,tau.1=F){
+kNormScore = function(G,W,X,y,R){
   # Input Checks
   k = ncol(G);
   if(nrow(W)!=k){stop("Dimension of weight matrix should match ncol(G).")}
   # Kernel matrix
-  if(!is.diagonal.matrix(W)){stop("Diagonal weight matrix is expected.")};
-  K = matIP(X=data.matrix(t(G)),A=W);
+  if(! matrixcalc::is.diagonal.matrix(W)){stop("Diagonal weight matrix is expected.")};
+  L = G %*% W;
   # Input formatting
   y = as.numeric(y);
   X = data.frame(X);
@@ -210,8 +196,8 @@ kScoreTest = function(G,W,X,y,R,tau.1=F){
   q = ncol(X);
   # Check for correlation structure
   if(missing(R)){
-    R = Ri = diag(n)
-  } else if(is.diagonal.matrix(R)){
+    R = Ri = diag(n);
+  } else if(matrixcalc::is.diagonal.matrix(R)){
     Ri = solve(R);
   } else {
     Ri = fastInv(R);
@@ -224,26 +210,19 @@ kScoreTest = function(G,W,X,y,R,tau.1=F){
   # Estimate alpha under H0
   Dx = model.matrix(~.,data=X);
   alpha0 = Alpha0(X=Dx,Ri=Ri,y=y);
-  # Null residuals
-  e0 = (y - Dx %*% alpha0);
   # Estimate tau
-  if(tau.1){
-    D = model.matrix(~.,data=data.frame(X,G))
-    tau = Tau1(D=D,Ri=Ri,y=y);
-  } else {
-    tau = sum(e0^2)/(n-q);
-  }
-  # Residual variance
-  V = residV(X=Dx,R=R,tau=tau);
+  tau0 = Tau0(X=Dx,Ri=Ri,y=y,a=alpha0);
   # Score statistic
-  Ts = qForm(K=K,s=e0);
+  S = knScore(X=Dx,L=L,Ri=Ri,y=y,tau=tau0);
+  Tk = S$Tk;
+  Q = S$Q;
   # Eigenvalues
-  U = K %*% V;
-  lambda = svds(A=U,k=k,nu=0,nv=0)$d;
-  lambda = round(lambda,digits=8);
+  U = matIP(X=L,A=Q);
+  lambda = eigen(x=U,symmetric=T,only.values=T)$values;
+  lambda = round(lambda,digits=6);
   # Calculate p-value
-  p = davies(q=Ts,lambda=lambda)$Qq;
+  p = CompQuadForm::davies(q=Tk,lambda=lambda)$Qq;
   # Output
-  Out = list("Score"=Ts,"Eigenvalues"=lambda,"p"=p);
+  Out = list("Score"=Tk,"Eigenvalues"=lambda,"p"=p);
   return(Out);
 }

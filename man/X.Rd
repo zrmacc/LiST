@@ -9,7 +9,7 @@
    \item{Age}{Age.}
    \item{Sex}{Sex.}
    \item{PC1}{First principal component.}
-   \item{PC2}{First principal component.}
+   \item{PC2}{Second principal component.}
 }}
 \usage{
 X

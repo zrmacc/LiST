@@ -1,12 +1,12 @@
 #' Simulated Genotypes
 #' 
-#' Simulated genotypes for 1000 subjects at 1000 loci. Genotypes were simulated 
-#' with use of hapgen2, and are based on the haplotype structure of human 
-#' chromosome one in the CEU population of the 1000 Genomes Project.
-#' @format An integer matrix with 1000 rows and 1000 columns
-#' \describe{ 
-#'    \item{s1-s100}{s[i] is an integer vector of minor allele counts for the ith subject.}
-#' }
+#' Simulated genotypes for 1000 subjects at 1000 loci. Subjects are rows and 
+#' loci columns. Genotypes were simulated with use of hapgen2, and are based on
+#' the haplotype structure of human chromosome one in the CEU population of the
+#' 1000 Genomes Project.
+#' @format An integer matrix with 1000 rows and 1000 columns \describe{ 
+#'   \item{s1-s1000}{s[i] is an integer vector of minor allele counts for the
+#'   ith subject.} }
 "G"
 
 #' Simulated Covariates
@@ -20,15 +20,16 @@
 #'    \item{Age}{Age.}
 #'    \item{Sex}{Sex.}
 #'    \item{PC1}{First principal component.}
-#'    \item{PC2}{First principal component.}
+#'    \item{PC2}{Second principal component.}
 #' }
 "X"
 
 #' Simulated Phenotype
 #' 
-#' Phenotypes simulated under the null hypothesis of no
-#' genotypic effect. A subject specific linear predictor was calculated based on
-#' age, sex, pc1, and pc2. Residuals were drawn from a N(0,1) distribution. 
+#' Phenotypes simulated under the null hypothesis of no genotypic effect. A
+#' subject specific linear predictor was calculated based on the covaraites. For
+#' \code{Y.ind}, the residuals were drawn from a N(0,I) distribution. For \code{Y.corr},
+#' the residuals were drawn from a N(0,R) distribution
 #' @format A numeric matrix with 1000 rows and 1 columns
 #' \describe{
 #'    \item{YN}{Normal phenotype.}
