@@ -4,7 +4,7 @@
 \alias{Score.nlm}
 \title{Score Test for Normal Models}
 \usage{
-Score.nlm(y, Z, L, b0, K, tau)
+Score.nlm(y, Z, L, b0, tau, K)
 }
 \arguments{
 \item{y}{Response vector.}
@@ -17,11 +17,11 @@ indicating which columns have fixed coefficients under the null.}
 \item{b0}{Value of the regression coefficient for the selected columns under 
 the null. Defaults to zero.}
 
-\item{K}{Optional fixed correlation structure for variance component. Default
-is identity.}
-
 \item{tau}{Vaule of the scale parameter if known. If omitted, \eqn{\tau} is 
 estimated.}
+
+\item{K}{Optional fixed correlation structure for variance component. Default
+is identity.}
 }
 \value{
 Vector including the score statistic, the degrees of freedom, and a 
