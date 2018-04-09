@@ -2,7 +2,7 @@
 % Please edit documentation in R/RcppExports.R
 \name{fastInv}
 \alias{fastInv}
-\title{Fast Inverse}
+\title{Matrix Inverse}
 \usage{
 fastInv(A)
 }
@@ -10,5 +10,5 @@ fastInv(A)
 \item{A}{Numeric matrix.}
 }
 \description{
-Forms the product \eqn{X'AX}.
+Matrix Inverse
 }

@@ -2,87 +2,101 @@
 #include <Rcpp.h>
 #include <RcppEigen.h>
 
-//' Estimate \eqn{\alpha} under \eqn{H_{0}}.
+//' Normal Score Statistic
 //' 
-//' Estimates coefficient on nuisance parameter under the \eqn{H_{0}:\beta=0}.
-//' @param X Design matrix for alpha, numeric.
-//' @param Ri Inverse correlation structure, numeric.
-//' @param y Response, numeric.
-//' 
+//' @param y Outcome.
+//' @param X1 Model matrix whose coefficient is fixed.
+//' @param b Values at which the coefficients of X1 are fixed.
+//' @param X2 Model matrix whose coefficient is estimated.
+//' @param estT Logical indicating tau should be estimated. If false, provide the
+//'   known value.
+//' @param t Variance component, if known.
+//' @param useK Logical indicating that a known covariance structure is supplied.
+//' @param K Covariance structure, if known.
 // [[Rcpp::export]]
-SEXP Alpha0(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> Ri, const Eigen::Map<Eigen::VectorXd> y){
-  const Eigen::MatrixXd XtRi = (X.transpose()*Ri);
-  const Eigen::VectorXd a = (XtRi*X).llt().solve(XtRi*y);
-  return Rcpp::wrap(a);
+
+SEXP normScore(const Eigen::Map<Eigen::VectorXd> y, const Eigen::Map<Eigen::MatrixXd> X1,
+               const Eigen::Map<Eigen::VectorXd> b, const Eigen::Map<Eigen::MatrixXd> X2,
+               const bool estT, const double t, const bool useK, 
+               const Eigen::Map<Eigen::MatrixXd> K){
+  // Observations
+  const int n = y.size();
+  // Estimated parameters
+  const int p = X2.cols();
+  // Declare Qk
+  Eigen::MatrixXd Qk(n,n);
+  // Construct Qk
+  if(useK){
+    const Eigen::MatrixXd Ki = K.completeOrthogonalDecomposition().pseudoInverse();
+    Qk = Ki-X2*(X2.transpose()*K*X2).llt().solve(X2.transpose());
+  } else {
+    const Eigen::MatrixXd I = Eigen::MatrixXd::Identity(n,n);
+    Qk = I-X2*(X2.transpose()*X2).llt().solve(X2.transpose());
+  }
+  // Declare tau
+  double tau;
+  // Construct tau
+  if(estT){
+    const double qf = y.transpose()*Qk*y;
+    tau = qf/(n-p);
+  } else {
+    tau = t;
+  }
+  // Score
+  const Eigen::VectorXd u = X1.transpose()*Qk*(y-X1*b);
+  // Test statistic
+  const double T0 = u.transpose()*(X1.transpose()*Qk*X1).llt().solve(u);
+  const double T1 = T0/tau;
+  return Rcpp::wrap(T1);
 }
 
-//' Estimate \eqn{tau} under \eqn{H_{0}}.
+//' Weighted Normal Score Statistic
 //' 
-//' Estimates the variance component \eqn{\tau} under the reduced
-//' model where \eqn{\beta = 0}. 
-//' 
-//' @param X Overall design matrix, numeric.
-//' @param Ri Inverse correlation structure, numeric.
-//' @param y Response, numeric.
-//' @param a Estimated regression coefficient
-//' 
+//' @param y Outcome.
+//' @param X1 Model matrix whose coefficient is fixed.
+//' @param b Values at which the coefficients of X1 are fixed.
+//' @param X2 Model matrix whose coefficient is estimated.
+//' @param estT Logical indicating tau should be estimated. If false, provide the
+//'   known value.
+//' @param t Variance component, if known.
+//' @param useK Logical indicating that a known covariance structure is supplied.
+//' @param K Covariance structure, if known.
+//' @param W Weight matrix
 // [[Rcpp::export]]
-SEXP Tau0(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> Ri, 
-          const Eigen::Map<Eigen::VectorXd> y, const Eigen::Map<Eigen::VectorXd> a){
-  // Residuals
-  const Eigen::VectorXd e = (y-X*a);
-  // Dimensions
-  const int n = X.rows();
-  const int k = X.cols();
-  // Estimate
-  const double SS = (e.transpose() * Ri * e);
-  const double tau = SS/(n-k);
-  return Rcpp::wrap(tau);
-}
 
-//' Score Statistic for Normal Linear Model
-//' 
-//' Calculates the score statistic of \eqn{H_{0}:\beta_{G}=0} in the form
-//' \deqn{T_{S}=y'QG(G'QG)^{-1}G'Qy}
-//' 
-//' @param X Matrix whose regression coefficient is unconstrained in the null
-//'   model.
-//' @param G Matrix whose regression coefficient is zero in the null model.
-//' @param Ri Inverse correlation structure, numeric.
-//' @param y Response, numeric.
-//' @param tau Estimate of tau
-//'   
-// [[Rcpp::export]]
-SEXP nScore(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> G, 
-            const Eigen::Map<Eigen::MatrixXd> Ri, const Eigen::Map<Eigen::VectorXd> y, 
-            const double tau){
-  // Error projection matrix
-  const Eigen::MatrixXd Q = (Ri-Ri*X*(X.transpose()*Ri*X).llt().solve(X.transpose()*Ri))/tau;
-  // Score statistic
-  const Eigen::VectorXd s = G.transpose()*Q*y;
-  const double Ts = s.transpose()*(G.transpose()*Q*G).llt().solve(s);
-  return Rcpp::wrap(Ts);
-}
-
-//' Kernalized Score Statistic for Normal Linear Model
-//' 
-//' Calculates a kernelized score statistic of \eqn{H_{0}:\beta = 0} in the form
-//' \deqn{T_{K} = \epsilon'K\epsilon} where \eqn{K = LL'}
-//' 
-//' @param X Matrix whose regression coefficient is unconstrained in the null
-//'   model.
-//' @param L Cholesky decomposition of kernel matrix.
-//' @param Ri Inverse correlation structure, numeric.
-//' @param y Response, numeric.
-//' @param tau Estimate of tau
-//'   
-// [[Rcpp::export]]
-SEXP knScore(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> L, 
-             const Eigen::Map<Eigen::MatrixXd> Ri, const Eigen::Map<Eigen::VectorXd> y, 
-             const double tau){
-  // Error projection matrix
-  const Eigen::MatrixXd Q = (Ri-Ri*X*(X.transpose()*Ri*X).llt().solve(X.transpose()*Ri))/tau;
-  // Score statistic
-  const double Tk = y.transpose()*Q*L*L.transpose()*Q*y;
-  return Rcpp::List::create(Rcpp::Named("Tk")=Tk,Rcpp::Named("Q")=Q);
+SEXP wNormScore(const Eigen::Map<Eigen::VectorXd> y, const Eigen::Map<Eigen::MatrixXd> X1,
+                const Eigen::Map<Eigen::VectorXd> b, const Eigen::Map<Eigen::MatrixXd> X2,
+                const bool estT, const double t, const bool useK, 
+                const Eigen::Map<Eigen::MatrixXd> K, const Eigen::Map<Eigen::MatrixXd> W){
+  // Observations
+  const int n = y.size();
+  // Estimated parameters
+  const int p = X2.cols();
+  // Declare Qk
+  Eigen::MatrixXd Qk(n,n);
+  // Construct Qk
+  if(useK){
+    const Eigen::MatrixXd Ki = K.completeOrthogonalDecomposition().pseudoInverse();
+    Qk = Ki-X2*(X2.transpose()*K*X2).llt().solve(X2.transpose());
+  } else {
+    const Eigen::MatrixXd I = Eigen::MatrixXd::Identity(n,n);
+    Qk = I-X2*(X2.transpose()*X2).llt().solve(X2.transpose());
+  }
+  // Declare tau
+  double tau;
+  // Construct tau
+  if(estT){
+    const double qf = y.transpose()*Qk*y;
+    tau = qf/(n-p);
+  } else {
+    tau = t;
+  }
+  // Score
+  const Eigen::VectorXd u = Qk*(y-X1*b);
+  // Test statistic
+  const double T0 = u.transpose()*W*W*u;
+  const double T1 = T0/(tau*tau);
+  // Q matrix
+  const Eigen::MatrixXd Q = Qk/(tau);
+  return Rcpp::List::create(Rcpp::Named("Tw")=T1,Rcpp::Named("Q")=Q);
 }

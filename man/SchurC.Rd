@@ -2,19 +2,17 @@
 % Please edit documentation in R/RcppExports.R
 \name{SchurC}
 \alias{SchurC}
-\title{Schur Complement}
+\title{Schur complement}
 \usage{
-SchurC(Igg, Ihh, Igh, inv)
+SchurC(I11, I22, I12)
 }
 \arguments{
-\item{Igg}{First information matrix.}
+\item{I11}{Information of target parameter}
 
-\item{Ihh}{Second information matrix.}
+\item{I22}{Information of nuisance parameter}
 
-\item{Igh}{Cross information matrix.}
-
-\item{inv}{Return the inverse of the Schur complement?}
+\item{I12}{Cross information between target and nuisance parameters}
 }
 \description{
-Calcualtes the matrix \deqn{I_{gg}-I_{gh}I_{hh}^{-1}I_{gh}'}
+Calculates the efficient information \eqn{I_{11}-I_{12}I_{22}^{-1}I_{21}};
 }

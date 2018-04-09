@@ -1,12 +1,12 @@
 ---
 title: "README"
 author: "Zachary McCaw"
-date: "12/15/17"
+date: "`r Sys.Date()`"
 output: 
   html_document: 
     keep_md: TRUE
 --- 
 
 # Package Vignette
-```{r,child='vignettes/NormalScoreTest.Rmd'}
+```{r,child='vignettes/NST_Vignette.Rmd'}
 ```

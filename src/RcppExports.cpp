@@ -6,33 +6,56 @@
 
 using namespace Rcpp;
 
-// exchCorr
-SEXP exchCorr(const int n, const double r);
-RcppExport SEXP _NormalScoreTest_exchCorr(SEXP nSEXP, SEXP rSEXP) {
+// fastMvp
+SEXP fastMvp(const Eigen::Map<Eigen::MatrixXd> A, const Eigen::Map<Eigen::VectorXd> b);
+RcppExport SEXP _NST_fastMvp(SEXP ASEXP, SEXP bSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< const double >::type r(rSEXP);
-    rcpp_result_gen = Rcpp::wrap(exchCorr(n, r));
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type A(ASEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type b(bSEXP);
+    rcpp_result_gen = Rcpp::wrap(fastMvp(A, b));
     return rcpp_result_gen;
 END_RCPP
 }
-// matIP
-SEXP matIP(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> A);
-RcppExport SEXP _NormalScoreTest_matIP(SEXP XSEXP, SEXP ASEXP) {
+// fastMMp
+SEXP fastMMp(const Eigen::Map<Eigen::MatrixXd> A, const Eigen::Map<Eigen::MatrixXd> B);
+RcppExport SEXP _NST_fastMMp(SEXP ASEXP, SEXP BSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type A(ASEXP);
-    rcpp_result_gen = Rcpp::wrap(matIP(X, A));
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type B(BSEXP);
+    rcpp_result_gen = Rcpp::wrap(fastMMp(A, B));
+    return rcpp_result_gen;
+END_RCPP
+}
+// fastT
+SEXP fastT(const Eigen::Map<Eigen::MatrixXd> A);
+RcppExport SEXP _NST_fastT(SEXP ASEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type A(ASEXP);
+    rcpp_result_gen = Rcpp::wrap(fastT(A));
+    return rcpp_result_gen;
+END_RCPP
+}
+// fastIP
+SEXP fastIP(const Eigen::Map<Eigen::MatrixXd> A, const Eigen::Map<Eigen::MatrixXd> B);
+RcppExport SEXP _NST_fastIP(SEXP ASEXP, SEXP BSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type A(ASEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type B(BSEXP);
+    rcpp_result_gen = Rcpp::wrap(fastIP(A, B));
     return rcpp_result_gen;
 END_RCPP
 }
 // fastInv
 SEXP fastInv(const Eigen::Map<Eigen::MatrixXd> A);
-RcppExport SEXP _NormalScoreTest_fastInv(SEXP ASEXP) {
+RcppExport SEXP _NST_fastInv(SEXP ASEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -41,91 +64,120 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// fastDet
+SEXP fastDet(const Eigen::Map<Eigen::MatrixXd> A);
+RcppExport SEXP _NST_fastDet(SEXP ASEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type A(ASEXP);
+    rcpp_result_gen = Rcpp::wrap(fastDet(A));
+    return rcpp_result_gen;
+END_RCPP
+}
+// vecQF
+SEXP vecQF(const Eigen::Map<Eigen::VectorXd> x, const Eigen::Map<Eigen::MatrixXd> A);
+RcppExport SEXP _NST_vecQF(SEXP xSEXP, SEXP ASEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type A(ASEXP);
+    rcpp_result_gen = Rcpp::wrap(vecQF(x, A));
+    return rcpp_result_gen;
+END_RCPP
+}
+// matQF
+SEXP matQF(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> A);
+RcppExport SEXP _NST_matQF(SEXP XSEXP, SEXP ASEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type A(ASEXP);
+    rcpp_result_gen = Rcpp::wrap(matQF(X, A));
+    return rcpp_result_gen;
+END_RCPP
+}
+// incP
+SEXP incP(const Eigen::Map<Eigen::MatrixXd> A);
+RcppExport SEXP _NST_incP(SEXP ASEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type A(ASEXP);
+    rcpp_result_gen = Rcpp::wrap(incP(A));
+    return rcpp_result_gen;
+END_RCPP
+}
 // SchurC
-SEXP SchurC(const Eigen::Map<Eigen::MatrixXd> Igg, const Eigen::Map<Eigen::MatrixXd> Ihh, const Eigen::Map<Eigen::MatrixXd> Igh, const bool inv);
-RcppExport SEXP _NormalScoreTest_SchurC(SEXP IggSEXP, SEXP IhhSEXP, SEXP IghSEXP, SEXP invSEXP) {
+SEXP SchurC(const Eigen::Map<Eigen::MatrixXd> I11, const Eigen::Map<Eigen::MatrixXd> I22, const Eigen::Map<Eigen::MatrixXd> I12);
+RcppExport SEXP _NST_SchurC(SEXP I11SEXP, SEXP I22SEXP, SEXP I12SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type Igg(IggSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type Ihh(IhhSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type Igh(IghSEXP);
-    Rcpp::traits::input_parameter< const bool >::type inv(invSEXP);
-    rcpp_result_gen = Rcpp::wrap(SchurC(Igg, Ihh, Igh, inv));
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type I11(I11SEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type I22(I22SEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type I12(I12SEXP);
+    rcpp_result_gen = Rcpp::wrap(SchurC(I11, I22, I12));
     return rcpp_result_gen;
 END_RCPP
 }
-// Alpha0
-SEXP Alpha0(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> Ri, const Eigen::Map<Eigen::VectorXd> y);
-RcppExport SEXP _NormalScoreTest_Alpha0(SEXP XSEXP, SEXP RiSEXP, SEXP ySEXP) {
+// normScore
+SEXP normScore(const Eigen::Map<Eigen::VectorXd> y, const Eigen::Map<Eigen::MatrixXd> X1, const Eigen::Map<Eigen::VectorXd> b, const Eigen::Map<Eigen::MatrixXd> X2, const bool estT, const double t, const bool useK, const Eigen::Map<Eigen::MatrixXd> K);
+RcppExport SEXP _NST_normScore(SEXP ySEXP, SEXP X1SEXP, SEXP bSEXP, SEXP X2SEXP, SEXP estTSEXP, SEXP tSEXP, SEXP useKSEXP, SEXP KSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type Ri(RiSEXP);
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type y(ySEXP);
-    rcpp_result_gen = Rcpp::wrap(Alpha0(X, Ri, y));
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X1(X1SEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type b(bSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X2(X2SEXP);
+    Rcpp::traits::input_parameter< const bool >::type estT(estTSEXP);
+    Rcpp::traits::input_parameter< const double >::type t(tSEXP);
+    Rcpp::traits::input_parameter< const bool >::type useK(useKSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type K(KSEXP);
+    rcpp_result_gen = Rcpp::wrap(normScore(y, X1, b, X2, estT, t, useK, K));
     return rcpp_result_gen;
 END_RCPP
 }
-// Tau0
-SEXP Tau0(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> Ri, const Eigen::Map<Eigen::VectorXd> y, const Eigen::Map<Eigen::VectorXd> a);
-RcppExport SEXP _NormalScoreTest_Tau0(SEXP XSEXP, SEXP RiSEXP, SEXP ySEXP, SEXP aSEXP) {
+// wNormScore
+SEXP wNormScore(const Eigen::Map<Eigen::VectorXd> y, const Eigen::Map<Eigen::MatrixXd> X1, const Eigen::Map<Eigen::VectorXd> b, const Eigen::Map<Eigen::MatrixXd> X2, const bool estT, const double t, const bool useK, const Eigen::Map<Eigen::MatrixXd> K, const Eigen::Map<Eigen::MatrixXd> W);
+RcppExport SEXP _NST_wNormScore(SEXP ySEXP, SEXP X1SEXP, SEXP bSEXP, SEXP X2SEXP, SEXP estTSEXP, SEXP tSEXP, SEXP useKSEXP, SEXP KSEXP, SEXP WSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type Ri(RiSEXP);
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type y(ySEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type a(aSEXP);
-    rcpp_result_gen = Rcpp::wrap(Tau0(X, Ri, y, a));
-    return rcpp_result_gen;
-END_RCPP
-}
-// nScore
-SEXP nScore(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> G, const Eigen::Map<Eigen::MatrixXd> Ri, const Eigen::Map<Eigen::VectorXd> y, const double tau);
-RcppExport SEXP _NormalScoreTest_nScore(SEXP XSEXP, SEXP GSEXP, SEXP RiSEXP, SEXP ySEXP, SEXP tauSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type G(GSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type Ri(RiSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type y(ySEXP);
-    Rcpp::traits::input_parameter< const double >::type tau(tauSEXP);
-    rcpp_result_gen = Rcpp::wrap(nScore(X, G, Ri, y, tau));
-    return rcpp_result_gen;
-END_RCPP
-}
-// knScore
-SEXP knScore(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> L, const Eigen::Map<Eigen::MatrixXd> Ri, const Eigen::Map<Eigen::VectorXd> y, const double tau);
-RcppExport SEXP _NormalScoreTest_knScore(SEXP XSEXP, SEXP LSEXP, SEXP RiSEXP, SEXP ySEXP, SEXP tauSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type L(LSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type Ri(RiSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type y(ySEXP);
-    Rcpp::traits::input_parameter< const double >::type tau(tauSEXP);
-    rcpp_result_gen = Rcpp::wrap(knScore(X, L, Ri, y, tau));
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X1(X1SEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type b(bSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X2(X2SEXP);
+    Rcpp::traits::input_parameter< const bool >::type estT(estTSEXP);
+    Rcpp::traits::input_parameter< const double >::type t(tSEXP);
+    Rcpp::traits::input_parameter< const bool >::type useK(useKSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type K(KSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type W(WSEXP);
+    rcpp_result_gen = Rcpp::wrap(wNormScore(y, X1, b, X2, estT, t, useK, K, W));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_NormalScoreTest_exchCorr", (DL_FUNC) &_NormalScoreTest_exchCorr, 2},
-    {"_NormalScoreTest_matIP", (DL_FUNC) &_NormalScoreTest_matIP, 2},
-    {"_NormalScoreTest_fastInv", (DL_FUNC) &_NormalScoreTest_fastInv, 1},
-    {"_NormalScoreTest_SchurC", (DL_FUNC) &_NormalScoreTest_SchurC, 4},
-    {"_NormalScoreTest_Alpha0", (DL_FUNC) &_NormalScoreTest_Alpha0, 3},
-    {"_NormalScoreTest_Tau0", (DL_FUNC) &_NormalScoreTest_Tau0, 4},
-    {"_NormalScoreTest_nScore", (DL_FUNC) &_NormalScoreTest_nScore, 5},
-    {"_NormalScoreTest_knScore", (DL_FUNC) &_NormalScoreTest_knScore, 5},
+    {"_NST_fastMvp", (DL_FUNC) &_NST_fastMvp, 2},
+    {"_NST_fastMMp", (DL_FUNC) &_NST_fastMMp, 2},
+    {"_NST_fastT", (DL_FUNC) &_NST_fastT, 1},
+    {"_NST_fastIP", (DL_FUNC) &_NST_fastIP, 2},
+    {"_NST_fastInv", (DL_FUNC) &_NST_fastInv, 1},
+    {"_NST_fastDet", (DL_FUNC) &_NST_fastDet, 1},
+    {"_NST_vecQF", (DL_FUNC) &_NST_vecQF, 2},
+    {"_NST_matQF", (DL_FUNC) &_NST_matQF, 2},
+    {"_NST_incP", (DL_FUNC) &_NST_incP, 1},
+    {"_NST_SchurC", (DL_FUNC) &_NST_SchurC, 3},
+    {"_NST_normScore", (DL_FUNC) &_NST_normScore, 8},
+    {"_NST_wNormScore", (DL_FUNC) &_NST_wNormScore, 9},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_NormalScoreTest(DllInfo *dll) {
+RcppExport void R_init_NST(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }
