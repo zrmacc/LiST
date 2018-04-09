@@ -40,7 +40,7 @@ rScore.nlm = function(y,X1,X2,tau,K){
     if(missing(K)){
       aux = function(x){normScore(y=y,X1=x,b=0,X2=X2,estT=F,t=tau,useK=F,K=1)};
     } else {
-      aux = function(x){normScore(y=y,X1=X1,b=b0,X2=X2,estT=F,t=tau,useK=T,K=K)};
+      aux = function(x){normScore(y=y,X1=X1,b=0,X2=X2,estT=F,t=tau,useK=T,K=K)};
     }
   }
   # Calculate score statistics
