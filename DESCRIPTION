@@ -12,9 +12,6 @@ LinkingTo:
     RcppEigen
 Imports:
     CompQuadForm,
-    foreach,
-    matrixcalc,
-    rARPACK,
     Rcpp,
     RcppEigen,
     stats

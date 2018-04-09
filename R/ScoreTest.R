@@ -23,10 +23,9 @@ NULL
 #'   p-value based on the chi squared distribution.
 #'   
 #' @importFrom stats model.matrix pchisq
-#' @importFrom matrixcalc is.diagonal.matrix
 #' @export
 
-Score.nlm = function(y,Z,L,b0,K,tau){
+Score.nlm = function(y,Z,L,b0,tau,K){
   # Input checks
   if(!is.logical(L)){stop("L should be a logical vector.")};
   if(length(L)!=ncol(Z)){stop("L should have as many entries as columns in Z.")};
@@ -38,10 +37,8 @@ Score.nlm = function(y,Z,L,b0,K,tau){
   keep = !apply(A,MARGIN=1,FUN=aux);
   if(sum(!keep)>0){
     warning("Missing data detected. These observations are excluded.")
-    y.t = y.t[keep];
-    y.s = y.s[keep];
-    Z.t = Z.t[keep,];
-    Z.s = Z.s[keep,];
+    y = y[keep];
+    Z = Z[keep,];
   };
   # Null coefficient
   if(missing(b0)){b0=rep(0,times=sum(L))};
@@ -89,7 +86,6 @@ Score.nlm = function(y,Z,L,b0,K,tau){
 #'   p-value based on the chi squared distribution.
 #' 
 #' @importFrom CompQuadForm davies
-#' @importFrom matrixcalc is.diagonal.matrix is.positive.semi.definite
 #' @export
 
 wScore.nlm = function(y,Z,W,L,b0,tau,K){
@@ -105,10 +101,8 @@ wScore.nlm = function(y,Z,W,L,b0,tau,K){
   keep = !apply(A,MARGIN=1,FUN=aux);
   if(sum(!keep)>0){
     warning("Missing data detected. These observations are excluded.")
-    y.t = y.t[keep];
-    y.s = y.s[keep];
-    Z.t = Z.t[keep,];
-    Z.s = Z.s[keep,];
+    y = y[keep];
+    Z = Z[keep,];
   };
   # Null coefficient
   if(missing(b0)){b0=rep(0,times=sum(L))};
