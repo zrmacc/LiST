@@ -35,12 +35,12 @@ rScore.nlm = function(y,X1,X2,tau,K){
   # Fit null model
   if(missing(tau)){
     # Note: when tau is estimate, Ts is independent of K
-    M0 = fitNorm(y=y,Z=Z,estT=T,t=1,useK=F,K=1);
+    M0 = fitNorm(y=y,Z=X2,estT=T,t=1,useK=F,K=1);
   } else {
     if(missing(K)){
-      M0 = fitNorm(y=y,Z=Z,estT=F,t=tau,useK=F,K=1);
+      M0 = fitNorm(y=y,Z=X2,estT=F,t=tau,useK=F,K=1);
     } else {
-      M0 = fitNorm(y=y,Z=Z,estT=F,t=tau,useK=T,K=K);
+      M0 = fitNorm(y=y,Z=X2,estT=F,t=tau,useK=T,K=K);
     }
   }
   # Extract and scale residuals
