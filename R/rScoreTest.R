@@ -43,11 +43,12 @@ rScore.nlm = function(y,X1,X2,tau,K){
       M0 = fitNorm(y=y,Z=Z,estT=F,t=tau,useK=T,K=K);
     }
   }
-  # Extract error projection
+  # Extract and scale residuals
+  eT = (M0$eT/M0$Tau);
   Q = M0$Q;
   # Function to calculate score statistics
   aux = function(x){
-    a = as.numeric(fastIP(A=x,B=fastMvp(Q,y)));
+    a = as.numeric(fastIP(A=x,B=eT));
     b = vecQF(x=x,A=Q);
     Ts = a^2/b;
     return(Ts);
