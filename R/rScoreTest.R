@@ -1,9 +1,9 @@
 # Purpose: Repeated Score Test
-# Updated: 180409
+# Updated: 180413
 
 #' Repeated Score Test for Normal Models
 #' 
-#' Individually tests \eqn{H_{0}\beta_{j}=0} for each column of \code{X1}, 
+#' Individually tests \eqn{H_{0}:\beta_{j}=0} for each column of \code{X1}, 
 #' adjusting for \code{X2}.
 #' 
 #' @param y Response vector.
@@ -32,16 +32,25 @@ rScore.nlm = function(y,X1,X2,tau,K){
     y = y[keep];
     X2 = X2[keep,];
   };
-  # Calculate score statistic
+  # Fit null model
   if(missing(tau)){
     # Note: when tau is estimate, Ts is independent of K
-    aux = function(x){normScore(y=y,X1=x,b=0,X2=X2,estT=T,t=1,useK=F,K=1)};
+    M0 = fitNorm(y=y,Z=Z,estT=T,t=1,useK=F,K=1);
   } else {
     if(missing(K)){
-      aux = function(x){normScore(y=y,X1=x,b=0,X2=X2,estT=F,t=tau,useK=F,K=1)};
+      M0 = fitNorm(y=y,Z=Z,estT=F,t=tau,useK=F,K=1);
     } else {
-      aux = function(x){normScore(y=y,X1=X1,b=0,X2=X2,estT=F,t=tau,useK=T,K=K)};
+      M0 = fitNorm(y=y,Z=Z,estT=F,t=tau,useK=T,K=K);
     }
+  }
+  # Extract error projection
+  Q = M0$Q;
+  # Function to calculate score statistics
+  aux = function(x){
+    a = as.numeric(fastIP(A=x,B=fastMvp(Q,y)));
+    b = vecQF(x=x,A=Q);
+    Ts = a^2/b;
+    return(Ts);
   }
   # Calculate score statistics
   S = aaply(.data=X1,.margins=2,.fun=aux);

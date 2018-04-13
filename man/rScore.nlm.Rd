@@ -26,6 +26,6 @@ Vector of p-values, one for each column of \code{X1}, based on the
   chi square distribution.
 }
 \description{
-Individually tests \eqn{H_{0}\beta_{j}=0} for each column of \code{X1}, 
+Individually tests \eqn{H_{0}:\beta_{j}=0} for each column of \code{X1}, 
 adjusting for \code{X2}.
 }
