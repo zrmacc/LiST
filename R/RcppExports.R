@@ -145,9 +145,7 @@ wNormScore <- function(y, X1, b, X2, estT, t, useK, K, W) {
 #' @param estT Logical indicating tau should be estimated. If false, provide the
 #'   known value.
 #' @param t Variance component, if known.
-#' @param useK Logical indicating that a known covariance structure is supplied.
-#' @param K Covariance structure, if known.
-fitNorm <- function(y, Z, estT, t, useK, K) {
-    .Call('_NST_fitNorm', PACKAGE = 'NST', y, Z, estT, t, useK, K)
+fitNorm <- function(y, Z, estT, t) {
+    .Call('_NST_fitNorm', PACKAGE = 'NST', y, Z, estT, t)
 }
 

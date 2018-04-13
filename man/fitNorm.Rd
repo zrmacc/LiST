@@ -4,7 +4,7 @@
 \alias{fitNorm}
 \title{Normal Model}
 \usage{
-fitNorm(y, Z, estT, t, useK, K)
+fitNorm(y, Z, estT, t)
 }
 \arguments{
 \item{y}{Outcome.}
@@ -15,10 +15,6 @@ fitNorm(y, Z, estT, t, useK, K)
 known value.}
 
 \item{t}{Variance component, if known.}
-
-\item{useK}{Logical indicating that a known covariance structure is supplied.}
-
-\item{K}{Covariance structure, if known.}
 }
 \description{
 Normal Model

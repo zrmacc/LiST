@@ -110,46 +110,29 @@ SEXP wNormScore(const Eigen::Map<Eigen::VectorXd> y, const Eigen::Map<Eigen::Mat
 //' @param estT Logical indicating tau should be estimated. If false, provide the
 //'   known value.
 //' @param t Variance component, if known.
-//' @param useK Logical indicating that a known covariance structure is supplied.
-//' @param K Covariance structure, if known.
 // [[Rcpp::export]]
 
 SEXP fitNorm(const Eigen::Map<Eigen::VectorXd> y, const Eigen::Map<Eigen::MatrixXd> Z,
-             const bool estT, const double t,
-             const bool useK, const Eigen::Map<Eigen::MatrixXd> K){
+             const bool estT, const double t){
   // Observations
   const int n = y.size();
   // Estimated parameters
   const int p = Z.cols();
-  // Declare Pk
-  Eigen::MatrixXd Pk(p,n);
-  // Declare Qk
-  Eigen::MatrixXd Qk(n,n);
-  // Construct Qk
-  if(useK){
-    const Eigen::MatrixXd Ki = K.completeOrthogonalDecomposition().pseudoInverse();
-    Pk = (Z.transpose()*Ki*Z).llt().solve(Z.transpose()*Ki);
-    Qk = Ki-Z*(Z.transpose()*K*Z).llt().solve(Z.transpose());
-  } else {
-    const Eigen::MatrixXd I = Eigen::MatrixXd::Identity(n,n);
-    Pk = (Z.transpose()*Z).llt().solve(Z.transpose());
-    Qk = I-Z*Pk;
-  }
+  // Gram matrix
+  const Eigen::MatrixXd ZtZ = Z.transpose()*Z;
+  // Estimate beta
+  const Eigen::VectorXd b = (ZtZ).llt().solve(Z.transpose()*y);
+  // Calculate residuals
+  const Eigen::VectorXd eT = (y-Z*b);
   // Declare tau
   double tau;
-  // Construct tau
   if(estT){
-    const double qf = y.transpose()*Qk*y;
+    const double qf = (eT.transpose()*eT);
     tau = qf/(n-p);
   } else {
     tau = t;
   }
-  // Estimate beta
-  const Eigen::VectorXd b = Pk*y;
-  // Calculate residuals
-  const Eigen::VectorXd eT = (y-Z*b);
-  // Error projection
-  const Eigen::MatrixXd Q = Qk/(tau);
-  return Rcpp::List::create(Rcpp::Named("Beta")=b,Rcpp::Named("Tau")=tau,
-                            Rcpp::Named("Q")=Q,Rcpp::Named("eT")=eT);
+  // Information
+  const Eigen::MatrixXd Ibb = ZtZ/tau;
+  return Rcpp::List::create(Rcpp::Named("Beta")=b,Rcpp::Named("Tau")=tau,Rcpp::Named("Ibb")=Ibb,Rcpp::Named("eT")=eT);
 }

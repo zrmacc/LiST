@@ -4,7 +4,7 @@
 \alias{rScore.nlm}
 \title{Repeated Score Test for Normal Models}
 \usage{
-rScore.nlm(y, X1, X2, tau, K)
+rScore.nlm(y, X1, X2, tau)
 }
 \arguments{
 \item{y}{Response vector.}
@@ -17,9 +17,6 @@ unconstrained under the null.}
 
 \item{tau}{Vaule of the scale parameter if known. If omitted, \eqn{\tau} is 
 estimated.}
-
-\item{K}{Optional fixed correlation structure for variance component. Default
-is identity.}
 }
 \value{
 Vector of p-values, one for each column of \code{X1}, based on the 

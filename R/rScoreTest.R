@@ -13,8 +13,6 @@
 #'   unconstrained under the null.
 #' @param tau Vaule of the scale parameter if known. If omitted, \eqn{\tau} is 
 #'   estimated.
-#' @param K Optional fixed correlation structure for variance component. Default
-#'   is identity.
 #' @return Vector of p-values, one for each column of \code{X1}, based on the 
 #'   chi square distribution.
 #'   
@@ -22,7 +20,7 @@
 #' @importFrom stats model.matrix pchisq
 #' @export
 
-rScore.nlm = function(y,X1,X2,tau,K){
+rScore.nlm = function(y,X1,X2,tau){
   # Missingness
   A = cbind(y,X2);
   aux = function(x){sum(is.na(x))>0};
@@ -34,23 +32,20 @@ rScore.nlm = function(y,X1,X2,tau,K){
   };
   # Fit null model
   if(missing(tau)){
-    # Note: when tau is estimate, Ts is independent of K
-    M0 = fitNorm(y=y,Z=X2,estT=T,t=1,useK=F,K=1);
+    M0 = fitNorm(y=y,Z=X2,estT=T,t=1);
   } else {
-    if(missing(K)){
-      M0 = fitNorm(y=y,Z=X2,estT=F,t=tau,useK=F,K=1);
-    } else {
-      M0 = fitNorm(y=y,Z=X2,estT=F,t=tau,useK=T,K=K);
-    }
+    M0 = fitNorm(y=y,Z=X2,estT=F,t=tau);
   }
-  # Extract and scale residuals
-  eT = (M0$eT/M0$Tau);
-  Q = M0$Q;
+  # Extract residuals and scale residuals
+  eT = M0$eT
+  I22 = M0$Tau*M0$Ibb;
   # Function to calculate score statistics
   aux = function(x){
+    I11 = sum(x^2);
+    I12 = fastIP(A=x,B=X2);
+    V = as.numeric(SchurC(I11=I11,I22=I22,I12=I12));
     a = as.numeric(fastIP(A=x,B=eT));
-    b = vecQF(x=x,A=Q);
-    Ts = a^2/b;
+    Ts = a^2/(V*M0$Tau);
     return(Ts);
   }
   # Calculate score statistics

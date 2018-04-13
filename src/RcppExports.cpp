@@ -161,8 +161,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // fitNorm
-SEXP fitNorm(const Eigen::Map<Eigen::VectorXd> y, const Eigen::Map<Eigen::MatrixXd> Z, const bool estT, const double t, const bool useK, const Eigen::Map<Eigen::MatrixXd> K);
-RcppExport SEXP _NST_fitNorm(SEXP ySEXP, SEXP ZSEXP, SEXP estTSEXP, SEXP tSEXP, SEXP useKSEXP, SEXP KSEXP) {
+SEXP fitNorm(const Eigen::Map<Eigen::VectorXd> y, const Eigen::Map<Eigen::MatrixXd> Z, const bool estT, const double t);
+RcppExport SEXP _NST_fitNorm(SEXP ySEXP, SEXP ZSEXP, SEXP estTSEXP, SEXP tSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -170,9 +170,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type Z(ZSEXP);
     Rcpp::traits::input_parameter< const bool >::type estT(estTSEXP);
     Rcpp::traits::input_parameter< const double >::type t(tSEXP);
-    Rcpp::traits::input_parameter< const bool >::type useK(useKSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type K(KSEXP);
-    rcpp_result_gen = Rcpp::wrap(fitNorm(y, Z, estT, t, useK, K));
+    rcpp_result_gen = Rcpp::wrap(fitNorm(y, Z, estT, t));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -190,7 +188,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_NST_SchurC", (DL_FUNC) &_NST_SchurC, 3},
     {"_NST_normScore", (DL_FUNC) &_NST_normScore, 8},
     {"_NST_wNormScore", (DL_FUNC) &_NST_wNormScore, 9},
-    {"_NST_fitNorm", (DL_FUNC) &_NST_fitNorm, 6},
+    {"_NST_fitNorm", (DL_FUNC) &_NST_fitNorm, 4},
     {NULL, NULL, 0}
 };
 
