@@ -50,9 +50,10 @@ Score.nlm = function(y,Z,L,b10){
   if(df==length(L)){stop("At least 1 entry of L should be FALSE.")};
   # Check for missingness
   Miss = sum(is.na(y))+sum(is.na(Z));
-  if(Miss>0){stop("None of ys, Zt, or Zs, should contain missing values.")};
+  if(Miss>0){stop("Neither y nor Z, should contain missing values.")};
   # Null coefficient
   if(missing(b10)){b10=rep(0,times=df)};
+  if(length(b10)!=df){stop("b10 should contain a reference value for each TRUE element of L.")};
   
   # Partition target design
   # Zt1 is fixed under the null.
