@@ -2,20 +2,22 @@
 % Please edit documentation in R/RcppExports.R
 \name{fitNorm}
 \alias{fitNorm}
-\title{Normal Model}
+\title{Univariate OLS model.}
 \usage{
-fitNorm(y, Z, estT, t)
+fitNorm(y, Z)
 }
 \arguments{
 \item{y}{Outcome.}
 
 \item{Z}{Model matrix.}
-
-\item{estT}{Logical indicating tau should be estimated. If false, provide the
-known value.}
-
-\item{t}{Variance component, if known.}
+}
+\value{
+A list containing the following:
+\item{Beta}{Regression coefficient.}
+\item{Tau}{Outcome variance.}
+\item{Ibb}{Information matrix for beta.}
+\item{Resid}{Outcome residuals.}
 }
 \description{
-Normal Model
+Fits the standard OLS model.
 }

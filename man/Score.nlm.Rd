@@ -2,31 +2,41 @@
 % Please edit documentation in R/ScoreTest.R
 \name{Score.nlm}
 \alias{Score.nlm}
-\title{Score Test for Normal Models}
+\title{Score Test for Normal Linear Models}
 \usage{
-Score.nlm(y, Z, L, b0, tau, K)
+Score.nlm(y, Z, L, b10)
 }
 \arguments{
-\item{y}{Response vector.}
+\item{y}{Numeric response vector.}
 
 \item{Z}{Numeric model matrix.}
 
 \item{L}{Logical vector, with as many entires as columns in the model matrix,
 indicating which columns have fixed coefficients under the null.}
 
-\item{b0}{Value of the regression coefficient for the selected columns under 
+\item{b10}{Value of the regression coefficient for the selected columns under 
 the null. Defaults to zero.}
-
-\item{tau}{Vaule of the scale parameter if known. If omitted, \eqn{\tau} is 
-estimated.}
-
-\item{K}{Optional fixed correlation structure for variance component. Default
-is identity.}
 }
 \value{
-Vector including the score statistic, the degrees of freedom, and a 
-  p-value based on the chi squared distribution.
+A numeric vector containing the score statistic, the degrees of
+  freedom, and a p-value estimated using the chi-square distribution.
 }
 \description{
-Performs a score test of \eqn{H_{0}:\beta_{1}=\beta_{10}}.
+Performs a score test of \eqn{H_{0}:\beta_{1}=\beta_{10}}. The score test is 
+specified using a logical vector \code{L}, with as many entries as columns in
+the model matrix \code{Z}. The values of \code{L} set to \code{T} are fixed
+at \eqn{\beta_{10}} under the null. The values of \code{L} set to \code{F}
+are estimated.
+}
+\examples{
+y = D$y;
+Z = D$Z;
+# Overall test for covariate effects, should reject.
+Score.nlm(y=y,Z=Z,L=c(FALSE,TRUE,TRUE,TRUE));
+# Individual test of b3=0, should not reject.
+Score.nlm(y=y,Z=Z,L=c(FALSE,FALSE,FALSE,TRUE));
+# Joint test for the effects of b1=0 and b2=0, should reject.
+Score.nlm(y=y,Z=Z,L=c(FALSE,TRUE,TRUE,FALSE));
+# Individual test of b1=0.1, should not reject.
+Score.nlm(y=y,Z=Z,L=c(FALSE,TRUE,FALSE,FALSE),b10=c(0.1));
 }

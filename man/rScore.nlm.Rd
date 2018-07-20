@@ -4,25 +4,36 @@
 \alias{rScore.nlm}
 \title{Repeated Score Test for Normal Models}
 \usage{
-rScore.nlm(y, X1, X2, tau)
+rScore.nlm(y, Z1, Z2, parallel = F)
 }
 \arguments{
-\item{y}{Response vector.}
+\item{y}{Numeric response vector.}
 
-\item{X1}{Numeric matrix of covariates whose regression coefficients are 
-constrained under the null.}
+\item{Z1}{Numeric matrix of covariates for the target outcome whose 
+regression coefficients are zero under the null.}
 
-\item{X2}{Numeric matrix of covariates whose regression coefficients are 
-unconstrained under the null.}
+\item{Z2}{Numeric matrix of covariates for the target outcome whose 
+regression coefficients are unconstrained, i.e. estimated, under the null.}
 
-\item{tau}{Vaule of the scale parameter if known. If omitted, \eqn{\tau} is 
-estimated.}
+\item{parallel}{Run association tests if parallel? Must register parallel 
+backend first.}
 }
 \value{
 Vector of p-values, one for each column of \code{X1}, based on the 
   chi square distribution.
 }
 \description{
-Individually tests \eqn{H_{0}:\beta_{j}=0} for each column of \code{X1}, 
-adjusting for \code{X2}.
+Individually tests \eqn{H_{0}:\beta=0} for each column of \code{Z1}, 
+adjusting for \code{Z2}. Missing values are permitted in \code{Z1}, 
+though not in \code{Z2}.
+}
+\examples{
+y = D$y;
+Z = D$Z;
+set.seed(100);
+G = replicate(1000,rbinom(n=length(y),size=2,prob=0.25));
+storage.mode(G) = "numeric";
+# Test each column of G for association with y, adjusting for Z
+p = rScore.nlm(y=y,Z1=G,Z2=Z);
+mean(p<=0.05);
 }
