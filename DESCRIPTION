@@ -1,8 +1,8 @@
-Package: NST
-Title: Normal Linear Model Score Tests
-Version: 0.1.0
+Package: LiST
+Title: Linear Score Tests
+Version: 0.2.0
 Authors@R: person("Zachary", "McCaw", email = "zmccaw@g.harvard.edu", role = c("aut", "cre"))
-Description: Calculates score statistics for regression parameters in the normal linear models. Provides both the standard score test, and a weighted version. 
+Description: Implementation of score tests for linear models. 
 Depends: R (>= 3.4.0)
 License: GPL-2
 Encoding: UTF-8
@@ -12,10 +12,12 @@ LinkingTo:
     RcppEigen
 Imports:
     CompQuadForm,
+    foreach,
+    methods,
     plyr,
     Rcpp,
     stats
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 Suggests: knitr,
     rmarkdown
 VignetteBuilder: knitr
